@@ -1,0 +1,41 @@
+# Lesson: Responsive Mobile — Kotak Bisnis
+
+> Dari audit responsive semua halaman (2026-10-23), target HP 360–414px (acuan 375×667) + tablet 768px.
+> Konstanta shared: `src/lib/responsive.ts` (`TEXT_MICRO`, `TEXT_NANO`, `HIT_AREA`, `PAGE_GUTTER`, `MEDIA_QUERY`),
+> hook `src/hooks/useMediaQuery.ts`. Pakai ini — jangan tambal per halaman.
+
+## Checklist tiap halaman/komponen baru
+1. Tidak ada horizontal scroll di 360px (`min-w-0`, `truncate`, grid `minmax(0,1fr)`, tanpa lebar tetap besar)
+2. Gutter halaman dari `PAGE_GUTTER` (16px + safe-area, 24px di lg)
+3. Teks ≥ 12px di HP (`TEXT_MICRO`/`TEXT_NANO` kembali 11/10px di xl)
+4. Target sentuh ≥ 40px (`HIT_AREA` untuk kontrol kecil)
+5. Konten tidak tertutup MobileNav (padding bawah layout sudah `7rem + safe-area`)
+6. Efek khusus pointer (hover, Tilt) aman di layar sentuh
+
+## Input < 16px → iOS Safari auto-zoom
+Input form/search wajib `text-base sm:text-sm` (sudah di `FIELD_INPUT_CLASS` & `SearchBar`).
+
+## Safe-area iOS
+`env(safe-area-inset-*)` hanya bernilai kalau meta viewport punya `viewport-fit=cover` (sudah di `index.html`).
+Setelah itu tangani **semua sisi**: bawah (home indicator → MobileNav `bottom: max(1rem, env(...))`) dan
+kiri/kanan (notch saat landscape → `PAGE_GUTTER`).
+
+## Area sentuh tanpa mengubah tampilan
+`HIT_AREA` = pseudo `::after` transparan terpusat `min-h-10 min-w-10` → kontrol kecil (IconButton sm, trigger
+select, checkbox, tautan teks) tetap kecil secara visual tapi mudah di-tap. Butuh `relative` di elemen.
+
+## Layar sentuh vs mouse
+- CSS: varian Tailwind v4 `pointer-fine:` / `pointer-coarse:` (mis. teks "Arahkan kursor…" hanya `pointer-fine:inline`)
+- JS: `useMediaQuery(MEDIA_QUERY.coarsePointer)` → `Tilt` diam di layar sentuh
+
+## Elemen melayang di atas chart
+Chip/overlay `absolute` di atas chart yang di HP membungkus jadi 2 baris akan menimpa grafik. Di HP taruh di
+alur normal (di atas chart), mulai `sm:` baru `sm:absolute` + inset chart. Contoh: `BalanceCard`.
+
+## Susun ulang layout HP tanpa ubah DOM desktop
+Pembungkus `contents sm:flex` membuat anak-anaknya ikut grid induk di HP (mis. header 2 baris: sapaan + tombol,
+lalu search full width), sementara di sm+ kembali flex seperti desktop. Urutan DOM & aksesibilitas tetap.
+
+## Jangan taruh padding responsif di base komponen yang sering di-override
+`GlassCard` base `p-5`. Kalau base diberi `p-4 sm:p-6`, override pemakai `p-0`/`py-10` lewat `cn` hanya menghapus
+`p-4` — `sm:p-6` tetap hidup dan menang di sm+. Padding responsif ditaruh di **pemakai** (`p-5 sm:p-8`).
