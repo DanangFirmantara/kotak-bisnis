@@ -140,8 +140,9 @@ Hook di `.claude/settings.json` akan memblokir write berbahaya — pesan error d
 
 ## Key Contacts
 
-- Git user: _(belum diisi)_
-- Branch aktif: _(belum ada repo git)_
+- Git user: Danang Firmantara (`danangfirmantara837@gmail.com`)
+- Repo: https://github.com/DanangFirmantara/kotak-bisnis
+- Branch utama: `main` · Branch aktif (tempat push): `development`
 
 ---
 
