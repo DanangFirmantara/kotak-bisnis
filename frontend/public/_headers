@@ -1,5 +1,14 @@
 # Cloudflare (Workers static assets / Pages) — header kustom.
+# Aturan yang cocok digabung (header dari rule atas diwarisi rule bawah), jadi urutannya penting.
+
+# Semua path (termasuk index.html dan SPA fallback): selalu revalidasi.
+# Tanpa ini Safari/iOS memakai index.html lama dari cache → memuat chunk hash lama yang sudah dihapus
+# deploy baru → fallback SPA membalas text/html → "'text/html' is not a valid JavaScript MIME type".
+/*
+  Cache-Control: no-cache
+
 # Aset hasil build Vite punya hash di nama file → aman di-cache permanen.
-# index.html sengaja TIDAK di-cache lama supaya deploy baru langsung terambil.
+# `!` melepas Cache-Control warisan dari `/*` supaya tidak terkirim dobel ("no-cache, public, ...").
 /assets/*
+  ! Cache-Control
   Cache-Control: public, max-age=31536000, immutable

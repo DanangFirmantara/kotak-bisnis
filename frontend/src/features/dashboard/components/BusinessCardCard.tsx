@@ -39,7 +39,7 @@ export function BusinessCardCard() {
           <QueryState
             query={query}
             loadingLabel="Memuat kartu…"
-            loadingClassName="w-full max-w-64 sm:max-w-72"
+            loadingClassName="w-full max-w-56 sm:max-w-72"
             loading={<Skeleton className="aspect-[1.586] w-full rounded-2xl" />}
             error={{ title: 'Gagal memuat kartu' }}
             empty={{
@@ -48,7 +48,7 @@ export function BusinessCardCard() {
               description: 'Tambah kartu pertama untuk mulai.',
             }}
           >
-            {(cards) => <WalletCardStack cards={cards} className="py-4" />}
+            {(cards) => <WalletCardStack cards={cards} className="pt-4 pb-8 sm:py-4" />}
           </QueryState>
         </div>
       </div>

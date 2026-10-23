@@ -43,6 +43,10 @@ Hasilnya tidak deterministik & tidak terlihat di repo → selalu commit `wrangle
 - `frontend/public/_headers` didukung Workers static assets (format sama dengan Pages) → ikut ter-copy ke `dist/`.
 - `/assets/*` → `Cache-Control: public, max-age=31536000, immutable` (nama file ber-hash).
   **Jangan** cache `index.html` lama — dia yang menunjuk ke hash aset terbaru.
+- Rule `/*` → `Cache-Control: no-cache` wajib ada (HTML + SPA fallback tidak boleh di-cache lama). Rule yang cocok
+  **digabung**, jadi `/assets/*` harus melepas warisan dengan `! Cache-Control` sebelum set `immutable`
+  (kalau tidak, header terkirim dobel). Tanpa ini: Safari memakai index.html lama → chunk hash lama 404 → fallback
+  text/html → "'text/html' is not a valid JavaScript MIME type" (solusi lengkap: `frontend/lessons/build-chunking.md`).
 
 ## Syarat agar deep link aman
 `base` Vite harus `/` (default) → `dist/index.html` memuat `/assets/...` (absolut). Kalau `base: './'`,

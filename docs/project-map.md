@@ -19,7 +19,7 @@ kotak-bisnis/
 ├── frontend/                 # Vite + React + TS (deploy: Cloudflare Workers static assets)
 │   ├── .node-version         # 22 — dibaca build Cloudflare
 │   ├── wrangler.jsonc        # Workers assets ./dist + SPA fallback (not_found_handling)
-│   ├── public/_headers       # cache immutable /assets/*
+│   ├── public/_headers       # /* no-cache (HTML) + /assets/* immutable (! Cache-Control melepas warisan)
 │   └── lessons/              # lesson frontend (auth-jwt, api-integration, css-scoping, build-chunking, tooling-setup, routing, responsive-mobile)
 ├── docs/
 │   ├── project-map.md        # ← file ini
@@ -85,7 +85,8 @@ frontend/
     │   ├── auth/            # LoginPage.tsx (/login: kartu kaca max-w-md + hint akun demo)
     │   │   └── components/  # LoginForm (react-hook-form + loginSchema, Controller untuk checkbox, fieldset disabled saat submit)
     │   ├── coming-soon/     # ComingSoonPage.tsx ("<Menu> segera hadir", label + ikon dari findNavItem(pathname))
-    │   ├── errors/          # NotFoundPage.tsx (404: tampilkan path, Dashboard / halaman sebelumnya), AccessDeniedPage.tsx (403)
+    │   ├── errors/          # NotFoundPage.tsx (404: tampilkan path, Dashboard / halaman sebelumnya), AccessDeniedPage.tsx (403),
+    │   │                    #   RouteErrorPage.tsx (errorElement root route: error render/chunk usang, Muat ulang + Dashboard)
     │   └── health/          # HealthPage.tsx (/health publik), health-status.ts (HEALTH_STATUS_META, toHealthSummary)
     │       └── components/  # HealthBadge (pill status + dot berdenyut), HealthDetails (+ HealthDetailsSkeleton)
     ├── hooks/useDashboard.ts        # useDashboardData(), slice: useDashboardStats/useEarningsSummary/useOwnerProfile/useInbox/
@@ -109,6 +110,7 @@ frontend/
     ├── types/health.ts              # HealthStatus (UP/DOWN/UNKNOWN ala actuator), ComponentHealth, HealthInfo
     ├── types/auth.ts                # UserRole (OWNER/ADMIN/STAFF), AuthUser, LoginResponse
     └── lib/
+        ├── chunk-reload.ts  # isChunkLoadError, reloadOnceForStaleChunk (guard sessionStorage), installChunkErrorRecovery (vite:preloadError)
         ├── app-meta.ts      # APP_NAME, APP_VERSION, BUILD_TIME (dari define), getCopyright(year?) — identitas brand satu sumber
         ├── api.ts           # apiFetch<T>, ApiError, clearAuth, TOKEN_KEY/USER_KEY/EXP_KEY (belum dipakai), LOGIN_PATH, getErrorMessage(error, fallback?)
         ├── format.ts        # formatCurrency, formatNumber, formatCompact, formatPercent, formatByKind, formatSignedCurrency,

@@ -4,14 +4,24 @@ import { ACCESS_DENIED_PATH, RequireRole } from '@/components/auth/RequireRole'
 import { AppLayout } from '@/components/layout/AppLayout'
 import { ALL_NAV } from '@/components/layout/nav-items'
 import { StandaloneLayout } from '@/components/layout/StandaloneLayout'
+import { RouteErrorPage } from '@/features/errors/RouteErrorPage'
 import { LOGIN_PATH } from '@/lib/api'
+import { isChunkLoadError, reloadOnceForStaleChunk } from '@/lib/chunk-reload'
 
 /**
  * React.lazy untuk page dengan named export → tiap halaman jadi chunk sendiri
  * (recharts dll. tidak ikut bundle awal). Suspense-nya ada di AppLayout / StandaloneLayout.
  */
 function lazyPage<K extends string>(load: () => Promise<Record<K, ComponentType>>, name: K) {
-  return lazy(() => load().then((mod) => ({ default: mod[name] })))
+  return lazy(() =>
+    load()
+      .then((mod) => ({ default: mod[name] }))
+      .catch((error: unknown) => {
+        // Chunk hash lama hilang setelah redeploy → reload sekali; kalau ditahan guard / error lain → RouteErrorPage
+        if (isChunkLoadError(error)) reloadOnceForStaleChunk()
+        throw error
+      }),
+  )
 }
 
 const DashboardPage = lazyPage(() => import('@/features/dashboard/DashboardPage'), 'DashboardPage')
@@ -51,6 +61,7 @@ export const router = createBrowserRouter([
     // Fase UI (UAM belum ada): dashboard sengaja tetap bisa dibuka tanpa login.
     path: '/',
     element: <AppLayout />,
+    errorElement: <RouteErrorPage />,
     children: [...appRoutes, ...comingSoonRoutes],
   },
   {
@@ -58,6 +69,7 @@ export const router = createBrowserRouter([
     // `*` di sini aman: React Router me-ranking route statis (/, /bantuan, menu "segera hadir", /login, /health)
     // di atas splat, jadi `*` hanya menangkap path yang tidak cocok dengan route mana pun (mis. /asal, /a/b).
     element: <StandaloneLayout />,
+    errorElement: <RouteErrorPage />,
     children: [
       { path: LOGIN_PATH.slice(1), element: <LoginPage /> },
       { path: 'health', element: <HealthPage /> },

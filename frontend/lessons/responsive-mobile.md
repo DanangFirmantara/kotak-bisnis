@@ -48,3 +48,12 @@ Sidebar (≥ md) berisi Pengaturan, Bantuan, Keluar — di HP sidebar disembunyi
 ## Jangan taruh padding responsif di base komponen yang sering di-override
 `GlassCard` base `p-5`. Kalau base diberi `p-4 sm:p-6`, override pemakai `p-0`/`py-10` lewat `cn` hanya menghapus
 `p-4` — `sm:p-6` tetap hidup dan menang di sm+. Padding responsif ditaruh di **pemakai** (`p-5 sm:p-8`).
+
+## Elemen 3D (rotate / translateZ / stack offset) di HP
+Bounding box visual **membesar setelah transform**: `rotateX/Y` + perspektif membuat sisi dekat lebih besar, offset
+tumpukan (`translate3d`) menambah lebar/tinggi di luar kotak layout. Layout tidak tahu ini → kartu depan menembus
+border bawah pembungkus & kartu belakang mepet tepi kanan (bug `WalletCardStack`, iPhone 390px). Aturan:
+- Di < sm kecilkan elemen (mis. `max-w-56`), kurangi offset/`translateZ`/sudut rotasi (konstanta terpisah
+  `LAYER_MOBILE`/`POSE_MOBILE` + `useMediaQuery(MEDIA_QUERY.sm)`); desktop tetap.
+- Beri ruang aman di pembungkus (`pb-8 sm:py-4`) dan jangan andalkan `overflow-hidden` untuk menyembunyikan.
+- Offset satu arah membuat visual berat sebelah → geser stack berlawanan arah (`-translate-x-2 sm:translate-x-0`).
