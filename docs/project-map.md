@@ -16,12 +16,15 @@ kotak-bisnis/
 │   └── settings.json         # permissions + hooks (shared)
 ├── backend/                  # Spring Boot (Maven, Java 21)
 │   └── lessons/              # lesson backend (jwt-security, database-flyway, local-dev-tooling)
-├── frontend/                 # Vite + React + TS
+├── frontend/                 # Vite + React + TS (deploy: Cloudflare Pages)
+│   ├── .node-version         # 22 — dibaca Cloudflare Pages
+│   ├── public/_redirects     # SPA fallback /* → /index.html 200
+│   ├── public/_headers       # cache immutable /assets/*
 │   └── lessons/              # lesson frontend (auth-jwt, api-integration, css-scoping, build-chunking, tooling-setup, routing, responsive-mobile)
 ├── docs/
 │   ├── project-map.md        # ← file ini
 │   ├── planning/             # 1 file per fitur/task besar
-│   ├── lessons/              # lesson infra (docker-local)
+│   ├── lessons/              # lesson infra (docker-local, deploy-cloudflare-pages)
 │   └── _archive-ipa-esetuplimit/   # setting lama, referensi saja
 └── docker-compose.yml        # (belum) db + backend/frontend (profile full)
 ```

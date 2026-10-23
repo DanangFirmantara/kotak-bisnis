@@ -1,0 +1,5 @@
+# Cloudflare Pages — header kustom.
+# Aset hasil build Vite punya hash di nama file → aman di-cache permanen.
+# index.html sengaja TIDAK di-cache lama supaya deploy baru langsung terambil.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

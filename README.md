@@ -79,6 +79,37 @@ Buka **http://localhost:5173**.
 
 ---
 
+## Deploy (Cloudflare Pages)
+
+Frontend di-deploy sebagai situs statis ke [Cloudflare Pages](https://pages.cloudflare.com) langsung dari GitHub.
+Saat ini data masih dummy, jadi **tidak perlu environment variable** apa pun.
+
+### Langkah
+
+1. Buka dashboard Cloudflare → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
+2. Pilih repo `kotak-bisnis`, lalu isi setting build berikut
+3. Klik **Save and Deploy** — hasilnya bisa dibuka di `https://<nama-project>.pages.dev`
+
+| Setting | Nilai |
+|---|---|
+| Production branch | `main` |
+| Framework preset | `None` (atau `Vite`) |
+| Root directory | `frontend` |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Versi Node.js | `22` — dibaca otomatis dari `frontend/.node-version` |
+
+### Catatan
+
+- **SPA fallback**: `frontend/public/_redirects` mengarahkan semua path ke `index.html`, jadi refresh atau
+  membuka link langsung (mis. `/bantuan`) tidak 404. File statis (`/assets/*`, favicon) tetap dilayani apa adanya.
+- **Cache aset**: `frontend/public/_headers` membuat file di `/assets/*` (nama ber-hash) di-cache permanen;
+  `index.html` tidak, sehingga deploy baru langsung terlihat.
+- **Auto-deploy**: setiap push ke `main` otomatis di-deploy ke production. Push ke branch lain (mis. `development`)
+  menghasilkan **preview URL** tersendiri.
+
+---
+
 ## Struktur Project
 
 ```
