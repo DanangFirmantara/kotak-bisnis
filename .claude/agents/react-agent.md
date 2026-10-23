@@ -81,7 +81,7 @@ Jangan skip blok ini meskipun tidak ada lesson baru — tulis "Tidak ada lesson 
 | [`build-chunking.md`](../../frontend/lessons/build-chunking.md) | Lazy route, vendor groups Rolldown, jebakan dependensi tersedot ke chunk chart | Tambah library berat, ubah `vite.config.ts`, warning chunk >500 kB |
 | [`tooling-setup.md`](../../frontend/lessons/tooling-setup.md) | TS 6 (`erasableSyntaxOnly`, tanpa `baseUrl`), shadcn CLI 4 (`cn`, `radix-ui`), Recharts 3 tipe, Vite `define` build meta, react-hook-form + Zod (pin resolvers, `fieldset disabled`), quirk shell Windows | Tambah komponen shadcn, error TS aneh, script edit di Bash/PowerShell |
 | [`routing.md`](../../frontend/lessons/routing.md) | AppLayout vs StandaloneLayout, `*` di layout pathless, route "segera hadir" dari config nav, `lazyPage`, `navigate(-1)` aman, redirect login/guard | Tambah halaman/route baru, halaman publik/error, guard role |
-| [`responsive-mobile.md`](../../frontend/lessons/responsive-mobile.md) | Checklist HP 360px, `lib/responsive.ts` (TEXT_MICRO, HIT_AREA, PAGE_GUTTER), iOS auto-zoom input, safe-area, pointer coarse vs fine, overlay di atas chart, padding responsif di base komponen | **Setiap** halaman/komponen baru atau ubah layout |
+| [`responsive-mobile.md`](../../frontend/lessons/responsive-mobile.md) | Checklist HP 360px, `lib/responsive.ts` (TEXT_MICRO, HIT_AREA, PAGE_GUTTER), iOS auto-zoom input, safe-area, pointer coarse vs fine, overlay di atas chart, menu wajib punya padanan di HP, dropdown trigger kecil, padding responsif di base komponen | **Setiap** halaman/komponen baru atau ubah layout |
 
 ---
 

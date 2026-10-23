@@ -90,7 +90,8 @@ Buat planning file sebelum mulai task besar (lebih dari 1 sub-agent call), dan u
 4. **Spawn sub-agent** dengan prompt yang sudah include path eksak + context cukup
 5. **Verifikasi hasil** — cek file yang diubah sebelum lapor ke user
 6. **Update planning file** tandai task selesai
-7. **Delegasi push** via Bash tool (git operations langsung, tanpa spawn agent) — hanya kalau user minta
+7. **Tulis/update lesson SEBELUM push** — lesson dari LESSON REPORT agent ditulis ke lesson file + Lesson Index dulu, ikut di commit yang sama, baru push. Jangan push dengan lesson yang masih menggantung
+8. **Delegasi push** via Bash tool (git operations langsung, tanpa spawn agent) — hanya kalau user minta
 
 ---
 

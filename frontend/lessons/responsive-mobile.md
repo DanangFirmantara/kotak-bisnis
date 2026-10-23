@@ -36,6 +36,15 @@ alur normal (di atas chart), mulai `sm:` baru `sm:absolute` + inset chart. Conto
 Pembungkus `contents sm:flex` membuat anak-anaknya ikut grid induk di HP (mis. header 2 baris: sapaan + tombol,
 lalu search full width), sementara di sm+ kembali flex seperti desktop. Urutan DOM & aksesibilitas tetap.
 
+## Menu yang hanya ada di satu breakpoint wajib punya padanan
+Sidebar (≥ md) berisi Pengaturan, Bantuan, Keluar — di HP sidebar disembunyikan sehingga user **tidak bisa logout**
+(bug production 2026-10-23). Setiap menambah aksi/menu di Sidebar, cek padanannya di HP (MobileNav atau
+`AccountMenu` di Header). Pakai config & hook bersama (`SECONDARY_NAV`, `useLogout`) supaya tidak terduplikasi.
+
+## Dropdown shadcn dengan trigger kecil
+`DropdownMenuContent` default `w-(--radix-dropdown-menu-trigger-width)` → selebar trigger. Untuk trigger kecil
+(avatar 40px) timpa lebar (`w-64`) dan beri `collisionPadding` (16) supaya tidak menempel tepi layar HP.
+
 ## Jangan taruh padding responsif di base komponen yang sering di-override
 `GlassCard` base `p-5`. Kalau base diberi `p-4 sm:p-6`, override pemakai `p-0`/`py-10` lewat `cn` hanya menghapus
 `p-4` — `sm:p-6` tetap hidup dan menang di sm+. Padding responsif ditaruh di **pemakai** (`p-5 sm:p-8`).
