@@ -1,0 +1,13 @@
+// Cloudflare Workers — static assets only (tanpa Worker script / `main`).
+// SPA fallback untuk React Router diatur lewat `not_found_handling`,
+// BUKAN `_redirects` (rule `/* /index.html 200` ditolak Workers: error 100324).
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kotak-bisnis",
+  "compatibility_date": "2026-10-19",
+  "observability": { "enabled": true },
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  }
+}

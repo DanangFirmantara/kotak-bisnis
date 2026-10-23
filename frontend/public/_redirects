@@ -1,5 +1,0 @@
-# Cloudflare Pages — SPA fallback untuk React Router.
-# File statis yang ada (/assets/*, /favicon.svg) tetap dilayani duluan oleh Pages;
-# path lain (/bantuan, /login, /health, ...) dikembalikan ke index.html dengan status 200
-# supaya refresh / deep link tidak 404. Halaman 404 ditangani route `*` di sisi client.
-/*  /index.html  200

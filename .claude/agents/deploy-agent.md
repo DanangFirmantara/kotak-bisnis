@@ -76,7 +76,7 @@ Jangan skip blok ini meskipun tidak ada lesson baru — tulis "Tidak ada lesson 
 | File | Topik | Kapan dibaca |
 |---|---|---|
 | [`docker-local.md`](../../docs/lessons/docker-local.md) | Compose Postgres, Dockerfile multi-stage, nginx SPA, `VITE_*` build-time | Setiap task Docker / env / run lokal |
-| [`deploy-cloudflare-pages.md`](../../docs/lessons/deploy-cloudflare-pages.md) | Setting build Pages, `_redirects` SPA fallback, `_headers` cache, `.node-version`, env & CORS nanti | Setiap task deploy frontend / Cloudflare Pages |
+| [`deploy-cloudflare.md`](../../docs/lessons/deploy-cloudflare.md) | Deploy Workers static assets, `wrangler.jsonc` SPA fallback, error 100324 `_redirects`, auto-setup wrangler CI, `_headers`, `.node-version`, beda vs Pages, env & CORS nanti | Setiap task deploy frontend / Cloudflare |
 
 ---
 

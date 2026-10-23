@@ -79,30 +79,36 @@ Buka **http://localhost:5173**.
 
 ---
 
-## Deploy (Cloudflare Pages)
+## Deploy (Cloudflare Workers)
 
-Frontend di-deploy sebagai situs statis ke [Cloudflare Pages](https://pages.cloudflare.com) langsung dari GitHub.
+Frontend di-deploy sebagai situs statis ke [Cloudflare Workers](https://developers.cloudflare.com/workers/static-assets/)
+(static assets, tanpa Worker script) langsung dari GitHub. Konfigurasinya ada di `frontend/wrangler.jsonc`.
 Saat ini data masih dummy, jadi **tidak perlu environment variable** apa pun.
 
 ### Langkah
 
-1. Buka dashboard Cloudflare → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
+1. Buka dashboard Cloudflare → **Workers & Pages** → **Create** → **Import a repository** (Git)
 2. Pilih repo `kotak-bisnis`, lalu isi setting build berikut
-3. Klik **Save and Deploy** — hasilnya bisa dibuka di `https://<nama-project>.pages.dev`
+3. Klik **Deploy** — hasilnya bisa dibuka di `https://kotak-bisnis.<subdomain-akun>.workers.dev`
 
 | Setting | Nilai |
 |---|---|
+| Project name | `kotak-bisnis` (sama dengan `name` di `frontend/wrangler.jsonc`) |
 | Production branch | `main` |
-| Framework preset | `None` (atau `Vite`) |
 | Root directory | `frontend` |
 | Build command | `npm run build` |
-| Build output directory | `dist` |
+| Deploy command | `npx wrangler deploy` |
 | Versi Node.js | `22` — dibaca otomatis dari `frontend/.node-version` |
+
+Deploy manual dari lokal (butuh `npx wrangler login`): `cd frontend && npm run deploy`.
+Cek konfigurasi tanpa upload: `npm run build && npx wrangler deploy --dry-run`.
 
 ### Catatan
 
-- **SPA fallback**: `frontend/public/_redirects` mengarahkan semua path ke `index.html`, jadi refresh atau
-  membuka link langsung (mis. `/bantuan`) tidak 404. File statis (`/assets/*`, favicon) tetap dilayani apa adanya.
+- **SPA fallback**: `assets.not_found_handling: "single-page-application"` di `frontend/wrangler.jsonc` mengarahkan
+  path yang tidak ada ke `index.html`, jadi refresh atau membuka link langsung (mis. `/bantuan`) tidak 404.
+  File statis (`/assets/*`, favicon) tetap dilayani apa adanya. Jangan pakai `_redirects` `/* /index.html 200`
+  — rule itu ditolak Workers (error 100324, infinite loop).
 - **Cache aset**: `frontend/public/_headers` membuat file di `/assets/*` (nama ber-hash) di-cache permanen;
   `index.html` tidak, sehingga deploy baru langsung terlihat.
 - **Auto-deploy**: setiap push ke `main` otomatis di-deploy ke production. Push ke branch lain (mis. `development`)
