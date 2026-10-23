@@ -47,6 +47,17 @@ Hasilnya tidak deterministik & tidak terlihat di repo → selalu commit `wrangle
   **digabung**, jadi `/assets/*` harus melepas warisan dengan `! Cache-Control` sebelum set `immutable`
   (kalau tidak, header terkirim dobel). Tanpa ini: Safari memakai index.html lama → chunk hash lama 404 → fallback
   text/html → "'text/html' is not a valid JavaScript MIME type" (solusi lengkap: `frontend/lessons/build-chunking.md`).
+- Terverifikasi di production (2026-10-23): `/` & `/bantuan` → `no-cache`; `/assets/*.js` → `text/javascript` + `immutable`.
+
+## Verifikasi production setelah deploy
+- **Jeda propagasi ±1 menit:** `index.html` baru bisa live di edge sebelum aset barunya tersebar → request aset
+  sesaat dibalas fallback text/html. Normal & sementara; ditutup auto-reload sekali (`lib/chunk-reload.ts`).
+  Tunggu ±1–2 menit sebelum menyimpulkan deploy rusak.
+- Aset yang **tidak ada** di `/assets/*` tetap dibalas 200 `text/html` (fallback SPA bawaan Workers) — bukan 404.
+  Ini sumber error MIME untuk chunk usang; mitigasinya di sisi client. (Kalau suatu saat perlu 404 asli untuk
+  `/assets/*`, butuh Worker script + `run_worker_first` — belum sepadan untuk app ini.)
+- Cek header dengan `curl -sI <url>` dan, untuk meniru browser memuat script, tambah
+  `-H 'Sec-Fetch-Dest: script' -H 'Sec-Fetch-Mode: cors'`.
 
 ## Syarat agar deep link aman
 `base` Vite harus `/` (default) → `dist/index.html` memuat `/assets/...` (absolut). Kalau `base: './'`,
