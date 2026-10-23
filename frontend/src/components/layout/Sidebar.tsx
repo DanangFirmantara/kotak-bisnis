@@ -1,11 +1,10 @@
 import { LogOut } from 'lucide-react'
-import { useNavigate } from 'react-router'
 import { AppLogo } from '@/components/common/AppLogo'
 import { Avatar } from '@/components/common/Avatar'
 import { IconButton } from '@/components/common/IconButton'
 import { Skeleton } from '@/components/common/Skeleton'
 import { useOwnerProfile } from '@/hooks/useDashboard'
-import { LOGIN_PATH } from '@/lib/api'
+import { useLogout } from '@/hooks/useLogout'
 import { cn } from '@/lib/utils'
 import { MAIN_NAV, SECONDARY_NAV } from './nav-items'
 import { NavIconLink } from './NavIconLink'
@@ -17,7 +16,7 @@ const BLOCK_GAP = 'mt-8'
 /** Kolom ikon kaca di kiri: logo · nav utama · nav sekunder + keluar · avatar pemilik. */
 export function Sidebar({ className }: { className?: string }) {
   const profile = useOwnerProfile()
-  const navigate = useNavigate()
+  const logout = useLogout()
 
   return (
     <aside
@@ -46,13 +45,12 @@ export function Sidebar({ className }: { className?: string }) {
         {SECONDARY_NAV.map((item) => (
           <NavIconLink key={item.to} item={item} tooltipSide="right" />
         ))}
-        {/* Fase UI: cukup pindah ke /login. Nanti (auth JWT): clearAuth() + queryClient.clear() dulu (lessons/auth-jwt.md) */}
         <IconButton
           icon={LogOut}
           label="Keluar"
           variant="ghost"
           tooltipSide="right"
-          onClick={() => void navigate(LOGIN_PATH)}
+          onClick={logout}
         />
       </div>
 

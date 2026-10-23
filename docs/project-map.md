@@ -65,7 +65,7 @@ frontend/
     ├── build-meta.d.ts      # declare __APP_VERSION__ / __BUILD_TIME__ (baca via lib/app-meta.ts)
     ├── index.css            # SATU-SATUNYA tempat token: @theme static (sage, success, danger, ink, glass, canvas, blob, orb, shadow) + token shadcn dipetakan
     ├── components/
-    │   ├── ui/              # GlassCard.tsx · shadcn: button.tsx, tooltip.tsx, select.tsx, checkbox.tsx
+    │   ├── ui/              # GlassCard.tsx · shadcn: button.tsx, tooltip.tsx, select.tsx, checkbox.tsx, dropdown-menu.tsx
     │   ├── form/            # FormField, TextField, PasswordField, CheckboxField, FormAlert, field-styles.ts (FIELD_INPUT_CLASS, fieldErrorId)
     │   ├── motion/          # FadeIn.tsx, Stagger.tsx (Stagger + StaggerItem), Tilt.tsx (3D pointer), variants.ts (MOTION, ENTRANCE_DELAY)
     │   ├── common/          # IconButton (+ icon-button-variants.ts), Hint, IconCircle, Avatar, TrendBadge, SectionHeader,
@@ -93,6 +93,7 @@ frontend/
     │                                #   (select di query yang sama, tanpa fetch ganda), useBalanceOverview(period), dashboardKeys
     ├── hooks/useHealth.ts           # useHealth() (staleTime 0, refetchOnMount always), healthKeys
     ├── hooks/useCurrentRole.ts      # role user login — fase UI dari mocks/auth.ts, nanti dari useAuth()
+    ├── hooks/useLogout.ts           # () → fungsi keluar: navigate(LOGIN_PATH, replace) + queryClient.clear() (Sidebar & AccountMenu)
     ├── hooks/useLogin.ts            # useMutation(authService.login), sukses → navigate("/", replace) — belum simpan token
     ├── hooks/useCopyToClipboard.ts  # { state: idle|copied|error, copy(text) } — feedback reset 2 dtk
     ├── hooks/useMediaQuery.ts       # useMediaQuery(query) → boolean (useSyncExternalStore) — hanya bila nilai dibutuhkan di JS
@@ -181,10 +182,12 @@ shadow `shadow-glass`, `shadow-glass-lg` · font `font-sans` = Plus Jakarta Sans
 | `FIELD_INPUT_CLASS` / `fieldErrorId` | `components/form/field-styles.ts` | gaya input kaca (focus ring sage, aria-invalid danger) + id pesan error |
 | `AppLogo` | `components/common/AppLogo.tsx` | `decorative?` (nama app sudah tampil sebagai teks), `className` — IconCircle dark + Boxes (Sidebar, Login) |
 | `useLogin` | `hooks/useLogin.ts` | `()` → mutation `{ mutate(LoginInput), isPending, isError, error }`; sukses → `/` |
+| `useLogout` | `hooks/useLogout.ts` | `()` → `() => void`; ke `/login` (replace) + clear cache query |
 | `useCopyToClipboard` | `hooks/useCopyToClipboard.ts` | `(resetMs?)` → `{ state, copy(text) }` |
 | `useMediaQuery` | `hooks/useMediaQuery.ts` | `(query: string)` → `boolean` — pakai `MEDIA_QUERY.*`; layout tetap via class Tailwind (dipakai tinggi chart Saldo, Tilt diam di layar sentuh) |
 | `MEDIA_QUERY` / `TEXT_MICRO` / `TEXT_NANO` / `HIT_AREA` / `PAGE_GUTTER` | `lib/responsive.ts` | class/konstanta responsive bersama: teks kecil ≥12px di HP, area sentuh ≥40px tanpa ubah tampilan (sudah di `iconButtonVariants`, GlassSelect, CheckboxField), gutter + safe-area layout |
 | `Avatar` | `components/common/Avatar.tsx` | `name`, `size?: sm\|md\|lg` (inisial via `getInitials`), `verified?` (badge centang) |
+| `AccountMenu` | `components/common/AccountMenu.tsx` | `className?` — avatar → dropdown kaca: nama+email, `SECONDARY_NAV`, Keluar (`useLogout`). Dipasang di Header, hanya < md |
 | `TrendBadge` | `components/common/TrendBadge.tsx` | `value` (%), `invertColor?` (turun = bagus), `onDark?` |
 | `SectionHeader` | `components/common/SectionHeader.tsx` | `title`, `subtitle?`, `titleAdornment?`, `action?: ReactNode`, `onDark?` |
 | `BackgroundBlobs` | `components/layout/BackgroundBlobs.tsx` | — (fixed, -z-10) |
@@ -194,7 +197,7 @@ shadow `shadow-glass`, `shadow-glass-lg` · font `font-sans` = Plus Jakarta Sans
 | `GaugeChart` | `components/charts/GaugeChart.tsx` | `value` (0–100), `caption?` |
 | `ChartTooltip` | `components/charts/ChartTooltip.tsx` | dipakai via `<Tooltip content={(p) => <ChartTooltip {...p} formatValue={...} />} />` |
 | `CHART_COLORS`, `useSvgId` | `components/charts/chart-utils.ts` | warna chart dari token; id gradient SVG aman |
-| shadcn `Tooltip*`, `Button`, `Select*`, `Checkbox` | `components/ui/tooltip.tsx`, `button.tsx`, `select.tsx`, `checkbox.tsx` | generated — jangan edit manual |
+| shadcn `Tooltip*`, `Button`, `Select*`, `Checkbox`, `DropdownMenu*` | `components/ui/tooltip.tsx`, `button.tsx`, `select.tsx`, `checkbox.tsx`, `dropdown-menu.tsx` | generated — jangan edit manual |
 
 
 ---

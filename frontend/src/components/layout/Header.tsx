@@ -1,4 +1,5 @@
 import { Bell, MessagesSquare } from 'lucide-react'
+import { AccountMenu } from '@/components/common/AccountMenu'
 import { IconButton } from '@/components/common/IconButton'
 import { Skeleton } from '@/components/common/Skeleton'
 import { useInbox, useOwnerProfile } from '@/hooks/useDashboard'
@@ -7,7 +8,7 @@ import { SearchBar } from './SearchBar'
 
 /**
  * Header layout: sapaan pemilik · search pill · pesan & notifikasi.
- * HP (< sm, grid): baris 1 sapaan + 2 tombol, baris 2 search selebar penuh. ≥ sm: flex seperti desktop
+ * HP (< sm, grid): baris 1 sapaan + 2 tombol + avatar menu akun (< md), baris 2 search selebar penuh. ≥ sm: flex seperti desktop
  * (pembungkus search+tombol `contents` di HP supaya anaknya ikut grid tanpa mengubah DOM desktop).
  */
 export function Header() {
@@ -47,6 +48,8 @@ export function Header() {
             size="lg"
             showBadge={unreadNotifications > 0}
           />
+          {/* Menu akun hanya < md: di ≥ md Pengaturan/Bantuan/Keluar sudah ada di Sidebar */}
+          <AccountMenu className="md:hidden" />
         </div>
       </div>
     </header>

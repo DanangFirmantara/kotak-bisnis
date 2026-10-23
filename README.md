@@ -1,5 +1,11 @@
 # Kotak Bisnis
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-kotak--bisnis-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://kotak-bisnis.danangfirmantara837.workers.dev)
+![Version](https://img.shields.io/badge/version-0.1.0-7C9A82?style=for-the-badge)
+![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
+
+**Demo:** https://kotak-bisnis.danangfirmantara837.workers.dev
+
 Dashboard bisnis sederhana untuk memantau kondisi usaha dalam satu layar — pendapatan, pengeluaran, saldo,
 pelanggan, dan transfer terbaru — dengan tampilan **glassmorphism** yang lembut dan animasi masuk bertahap.
 
