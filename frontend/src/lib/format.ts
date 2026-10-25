@@ -99,3 +99,27 @@ export function formatDateTime(iso: string): string {
   const date = new Date(iso)
   return Number.isNaN(date.getTime()) ? '-' : dateTimeFormatter.format(date)
 }
+
+/** Nilai di kolom input uang: 55730 → "55.730", null / bukan angka → "" (pemisah ribuan id-ID, tanpa desimal). */
+export function formatNumberInput(value: number | null): string {
+  return value === null || !Number.isFinite(value) ? '' : formatNumber(Math.round(value))
+}
+
+export interface NumberInputOptions {
+  /** Boleh negatif (mis. kolom diskon / selisih) */
+  allowNegative?: boolean
+}
+
+/**
+ * Teks ketikan / tempelan → bilangan bulat. Terbaca benar untuk "55.730", "55,730", "Rp 55.730", "1.050.226";
+ * "55,5" / "55.50" (1–2 digit di ujung) dianggap pecahan lalu dibulatkan. Kosong / tanpa digit → null.
+ */
+export function parseNumberInput(text: string, { allowNegative = false }: NumberInputOptions = {}): number | null {
+  const negative = allowNegative && /^\s*(?:rp)?\s*[-−–]/i.test(text)
+  const body = text.replace(/rp/gi, '').replace(/[^\d.,]/g, '')
+  if (!/\d/.test(body)) return null
+  const decimal = /^(.*\d)[.,](\d{1,2})$/.exec(body)
+  const integerDigits = (decimal ? (decimal[1] ?? '') : body).replace(/[.,]/g, '')
+  const value = Math.round(Number(decimal ? `${integerDigits}.${decimal[2] ?? '0'}` : integerDigits))
+  return negative ? -value : value
+}
