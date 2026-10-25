@@ -4,6 +4,7 @@ import {
   CircleHelp,
   FileText,
   LayoutDashboard,
+  ReceiptText,
   Settings,
   Users,
   Wallet,
@@ -22,6 +23,7 @@ export interface NavItem {
  */
 export const MAIN_NAV: readonly NavItem[] = [
   { label: 'Dashboard', to: '/', icon: LayoutDashboard },
+  { label: 'Transaksi', to: '/transaksi', icon: ReceiptText },
   { label: 'Dompet', to: '/dompet', icon: Wallet },
   { label: 'Statistik', to: '/statistik', icon: ChartColumn },
   { label: 'Laporan', to: '/laporan', icon: FileText },
