@@ -20,7 +20,7 @@ kotak-bisnis/
 │   ├── .node-version         # 22 — dibaca build Cloudflare
 │   ├── wrangler.jsonc        # Workers assets ./dist + SPA fallback (not_found_handling)
 │   ├── public/_headers       # /* no-cache (HTML) + /assets/* immutable (! Cache-Control melepas warisan)
-│   └── lessons/              # lesson frontend (auth-jwt, api-integration, css-scoping, build-chunking, tooling-setup, routing, responsive-mobile)
+│   └── lessons/              # lesson frontend (auth-jwt, api-integration, css-scoping, build-chunking, tooling-setup, routing, responsive-mobile, receipt-parsing)
 ├── docs/
 │   ├── project-map.md        # ← file ini
 │   ├── planning/             # 1 file per fitur/task besar
@@ -87,8 +87,12 @@ frontend/
     │   ├── coming-soon/     # ComingSoonPage.tsx ("<Menu> segera hadir", label + ikon dari findNavItem(pathname))
     │   ├── errors/          # NotFoundPage.tsx (404: tampilkan path, Dashboard / halaman sebelumnya), AccessDeniedPage.tsx (403),
     │   │                    #   RouteErrorPage.tsx (errorElement root route: error render/chunk usang, Muat ulang + Dashboard)
-    │   └── health/          # HealthPage.tsx (/health publik), health-status.ts (HEALTH_STATUS_META, toHealthSummary)
-    │       └── components/  # HealthBadge (pill status + dot berdenyut), HealthDetails (+ HealthDetailsSkeleton)
+    │   ├── health/          # HealthPage.tsx (/health publik), health-status.ts (HEALTH_STATUS_META, toHealthSummary)
+    │   │   └── components/  # HealthBadge (pill status + dot berdenyut), HealthDetails (+ HealthDetailsSkeleton)
+    │   └── transaksi/       # TransaksiPage.tsx (/transaksi: stepper 4 langkah), useReceiptFlow.ts (state alur: foto, halaman teks,
+    │       │                #   dedup, mappings, template, parsed; RECEIPT_STEPS, STEP), receipt-tips.ts (RECEIPT_TIPS konten statis)
+    │       └── components/  # UploadStep (+ PhotoList, ReceiptTips; toggle mode Ringkas/Lengkap, tombol "Coba dengan contoh struk", StateMessage retry), RawTextStep (+ PageEditor; edit teks per foto + dedup), PatternStep
+    │                        #   (+ PatternGroupCard, TemplatePicker), ResultStep (mode lengkap, RHF+Zod; + ReceiptCheck, ReceiptItemsTable), SimpleResultStep (mode ringkas: + SimpleItemsTable, RawTextPanel collapsible), SpendingChartCard (grafik "Belanja terbesar", dipakai kedua mode)
     ├── hooks/useDashboard.ts        # useDashboardData(), slice: useDashboardStats/useEarningsSummary/useOwnerProfile/useInbox/
     │                                #   useBusinessCards/useTransfers/useSecurityStatus
     │                                #   (select di query yang sama, tanpa fetch ganda), useBalanceOverview(period), dashboardKeys
@@ -98,6 +102,18 @@ frontend/
     ├── hooks/useLogin.ts            # useMutation(authService.login), sukses → navigate("/", replace) — belum simpan token
     ├── hooks/useCopyToClipboard.ts  # { state: idle|copied|error, copy(text) } — feedback reset 2 dtk
     ├── hooks/useMediaQuery.ts       # useMediaQuery(query) → boolean (useSyncExternalStore) — hanya bila nilai dibutuhkan di JS
+    ├── hooks/useReceipt.ts          # useReadReceipt() (OCR, mutation, vars {files, onProgress?}), useReadSampleReceipt() (contoh mock), useReceiptTemplates(), useSaveReceiptTemplate(),
+    │                                #   useSaveTransaction() (dummy), receiptKeys
+    ├── services/receipt.service.ts  # receiptService.readReceipt(files, {onProgress}) → RawReceipt (OCR Tesseract.js asli), readSampleReceipt() (mock contoh), releaseEngine(), SAMPLE_RECEIPT_PAGES,
+    │                                #   listTemplates / saveTemplate (in-memory) / saveTransaction (dummy)
+    ├── services/receipt-ocr.ts      # mesin OCR: import("tesseract.js") dinamis (chunk sendiri), 1 worker lazy ind+eng PSM 4 dipakai ulang, recognizeReceiptPhoto(file,page,{onProgress,readFooter}) —
+    │                                #   foto terakhir: pass kedua khusus footer (crop bawah 30%, gray, PSM 6) untuk TOTAL,
+    │                                #   releaseReceiptEngine(), ReceiptReadError (pesan siap tampil); worker/core/model dari CDN jsdelivr (tanpa CSP di _headers)
+    ├── schemas/receipt.schema.ts    # receiptFormSchema (mode lengkap: header + items[] uid/code/name/qty/unitPrice/discount/subtotal), simpleReceiptFormSchema (mode ringkas: total + items[] uid/code/name/subtotal)
+    ├── mocks/receipt.ts             # receiptMock (2 foto Hari Hari, transkripsi apa adanya, overlap 44 baris; Σ net 1.050.226, Σ qty 58, hemat 232.515),
+    │                                #   receiptTemplatesStore (in-memory, hanya diubah service)
+    ├── types/receipt.ts             # Token/TokenType, RawReceipt, ReadProgress, LineRole/SegmentRole, LineGroup, GroupMappings, ReceiptTemplate,
+    │                                #   ReceiptItem, ParsedReceipt, ReceiptValidation
     ├── services/dashboard.service.ts # dashboardService.getDashboard(), .getBalance(period) — mock + delay 300ms
     ├── services/health.service.ts   # healthService.getHealth() — APP_VERSION/BUILD_TIME asli + mock, delay 250ms (nanti /api/health)
     ├── services/auth.service.ts     # authService.login(input) — cek DEMO_ACCOUNT, delay 600ms, gagal → ApiError(401); DEMO_LOGIN_HINT (nanti POST /api/auth/login)
@@ -110,6 +126,13 @@ frontend/
     ├── types/health.ts              # HealthStatus (UP/DOWN/UNKNOWN ala actuator), ComponentHealth, HealthInfo
     ├── types/auth.ts                # UserRole (OWNER/ADMIN/STAFF), AuthUser, LoginResponse
     └── lib/
+        ├── receipt/         # fungsi MURNI parsing struk (tanpa React): tokenize.ts (parseAmount, normalizeLine, tokenize — toleran noise OCR),
+        │                    #   groupLines.ts (analyzeLine, groupLines: signature + keyword), roles.ts (suggestMappings, defaultSegments, label peran),
+        │                    #   dedupOverlap.ts (findOverlap, mergeReceiptPages — fuzzy), similarity.ts (lineSimilarity), applyTemplate.ts,
+        │                    #   validateReceipt.ts (validateReceipt, expectedSubtotal), dates.ts (parseReceiptDate),
+        │                    #   preprocess.ts (preprocessImage: upscale/downscale + grayscale + binarisasi adaptif via canvas, opsi `region` crop; enhancePixels/otsu/adaptiveBinarize murni),
+        │                    #   extractSimple.ts (mode ringkas: extractSimple → items {kode?,nama,subtotal} + total; isTotalLine), index.ts
+        ├── top-n.ts         # topNWithOthers(rows, {limit, othersLabel}) → RankedRow[] (top N + baris agregat "Lainnya (N item)", share, key unik) — murni
         ├── chunk-reload.ts  # isChunkLoadError, reloadOnceForStaleChunk (guard sessionStorage), installChunkErrorRecovery (vite:preloadError)
         ├── app-meta.ts      # APP_NAME, APP_VERSION, BUILD_TIME (dari define), getCopyright(year?) — identitas brand satu sumber
         ├── api.ts           # apiFetch<T>, ApiError, clearAuth, TOKEN_KEY/USER_KEY/EXP_KEY (belum dipakai), LOGIN_PATH, getErrorMessage(error, fallback?)
@@ -126,6 +149,7 @@ frontend/
 | Path | Layout | Page | Catatan |
 |---|---|---|---|
 | `/` | AppLayout | `DashboardPage` | |
+| `/transaksi` | AppLayout | `TransaksiPage` | baca struk belanja (fase UI, data dummy); menu "Transaksi" di `MAIN_NAV` |
 | `/bantuan` | AppLayout | `HelpPage` | |
 | `/dompet`, `/statistik`, `/laporan`, `/pelanggan`, `/kalender`, `/pengaturan` | AppLayout | `ComingSoonPage` | di-generate dari `ALL_NAV` yang belum ada di `appRoutes` |
 | `/akses-ditolak` | StandaloneLayout | `AccessDeniedPage` (403) | tujuan redirect `RequireRole` (`ACCESS_DENIED_PATH`) |
@@ -180,6 +204,16 @@ shadow `shadow-glass`, `shadow-glass-lg` · font `font-sans` = Plus Jakarta Sans
 | `TextField` | `components/form/TextField.tsx` | atribut `<input>` + `label`, `icon?: LucideIcon`, `error?` (aria-invalid/aria-describedby), `trailing?`, `containerClassName?` — kompatibel `{...register()}` (React 19 ref prop) |
 | `PasswordField` | `components/form/PasswordField.tsx` | props TextField tanpa `type`/`trailing` — tombol mata IconButton (label berubah) |
 | `CheckboxField` | `components/form/CheckboxField.tsx` | props shadcn Checkbox + `label` — dengan RHF pakai `Controller` (`onCheckedChange={(v) => field.onChange(v === true)}`) |
+| `FileDropzone` | `components/form/FileDropzone.tsx` | `accept?`, `multiple?`, `disabled?`, `title`, `description?`, `onFiles(File[])` — area pilih/seret file (label + input sr-only), filter `accept`, tidak mengunggah |
+| `EditableTable` | `components/form/EditableTable.tsx` | generik `Row {id}`: `columns {id, header, width, fullWidthOnMobile?}`, `rows`, `renderCell(columnId,row,index)`, `onAdd`, `onRemove`, `rowLabel`, `isRowFlagged?` — grid ≥ lg, kartu 2 kolom di HP |
+| `Stepper` | `components/common/Stepper.tsx` | `steps {id,label}[]`, `current`, `onStepClick?` (langkah lewat bisa diklik) — label tiap langkah ≥ sm, HP: "Langkah N dari M" |
+| `ProgressBar` | `components/common/ProgressBar.tsx` | `value` (0..1), `label` — role progressbar |
+| `FIELD_CELL_CLASS` / `FIELD_TEXTAREA_CLASS` | `components/form/field-styles.ts` | gaya input sel tabel (h-10) / textarea monospace |
+| `MoneyInput` | `components/form/MoneyInput.tsx` | `value: number | null`, `onChange(number | null)`, `allowNegative?`, `prefix?` ("Rp" kecil di dalam), + atribut input — teks terformat id-ID saat mengetik (`55.730`), caret dijaga (hitung digit kiri caret), tempel `55,730`/`Rp 55.730` terbaca benar; pakai dengan `Controller` (`{...field}`), `className={FIELD_CELL_CLASS}` untuk sel tabel |
+| `MoneyField` | `components/form/MoneyField.tsx` | props MoneyInput + `label`, `error?`, `containerClassName?` — padanan `TextField` untuk uang (prefix default "Rp", aria-invalid/describedby) |
+| `formatNumberInput` / `parseNumberInput` | `lib/format.ts` | murni: `55730 → "55.730"` · teks → bilangan bulat (`allowNegative?`; pecahan 1–2 digit di ujung dibulatkan) |
+| `SegmentedControl` | `components/common/SegmentedControl.tsx` | generik `value: T`, `onChange`, `options {value,label}[]`, `label`, `disabled?` — radiogroup pill, tinggi 40px |
+| `HorizontalBarChart` | `components/charts/HorizontalBarChart.tsx` | generik `data`, `labelKey`, `valueKey`, `formatValue?` (label ujung bar), `formatTooltipValue?`, `isMuted?(row)` (bar redup), `getDetail?(row)` (teks tooltip), `ariaLabel` — bar horizontal peringkat, tinggi otomatis per baris, label kiri dipotong "…" (nama penuh di tooltip), sumbu X hidden |
 | `FormAlert` | `components/form/FormAlert.tsx` | `message?: string \| null` (kosong = tidak render), `className` — error submit, danger soft, role alert |
 | `FIELD_INPUT_CLASS` / `fieldErrorId` | `components/form/field-styles.ts` | gaya input kaca (focus ring sage, aria-invalid danger) + id pesan error |
 | `AppLogo` | `components/common/AppLogo.tsx` | `decorative?` (nama app sudah tampil sebagai teks), `className` — IconCircle dark + Boxes (Sidebar, Login) |
@@ -190,6 +224,7 @@ shadow `shadow-glass`, `shadow-glass-lg` · font `font-sans` = Plus Jakarta Sans
 | `MEDIA_QUERY` / `TEXT_MICRO` / `TEXT_NANO` / `HIT_AREA` / `PAGE_GUTTER` | `lib/responsive.ts` | class/konstanta responsive bersama: teks kecil ≥12px di HP, area sentuh ≥40px tanpa ubah tampilan (sudah di `iconButtonVariants`, GlassSelect, CheckboxField), gutter + safe-area layout |
 | `Avatar` | `components/common/Avatar.tsx` | `name`, `size?: sm\|md\|lg` (inisial via `getInitials`), `verified?` (badge centang) |
 | `AccountMenu` | `components/common/AccountMenu.tsx` | `className?` — avatar → dropdown kaca: nama+email, `SECONDARY_NAV`, Keluar (`useLogout`). Dipasang di Header, hanya < md |
+| `ChartTooltip` detail | `components/charts/ChartTooltip.tsx` | prop baru `detail?` (baris keterangan, mis. "12,3% dari total") |
 | `TrendBadge` | `components/common/TrendBadge.tsx` | `value` (%), `invertColor?` (turun = bagus), `onDark?` |
 | `SectionHeader` | `components/common/SectionHeader.tsx` | `title`, `subtitle?`, `titleAdornment?`, `action?: ReactNode`, `onDark?` |
 | `BackgroundBlobs` | `components/layout/BackgroundBlobs.tsx` | — (fixed, -z-10) |

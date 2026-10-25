@@ -25,6 +25,7 @@ function lazyPage<K extends string>(load: () => Promise<Record<K, ComponentType>
 }
 
 const DashboardPage = lazyPage(() => import('@/features/dashboard/DashboardPage'), 'DashboardPage')
+const TransaksiPage = lazyPage(() => import('@/features/transaksi/TransaksiPage'), 'TransaksiPage')
 const HelpPage = lazyPage(() => import('@/features/help/HelpPage'), 'HelpPage')
 const ComingSoonPage = lazyPage(() => import('@/features/coming-soon/ComingSoonPage'), 'ComingSoonPage')
 const AccessDeniedPage = lazyPage(() => import('@/features/errors/AccessDeniedPage'), 'AccessDeniedPage')
@@ -35,6 +36,7 @@ const LoginPage = lazyPage(() => import('@/features/auth/LoginPage'), 'LoginPage
 /** Halaman yang sudah dibuat di dalam shell. Tambah halaman menu baru DI SINI → route "segera hadir"-nya hilang otomatis. */
 const appRoutes: RouteObject[] = [
   { index: true, element: <DashboardPage /> },
+  { path: 'transaksi', element: <TransaksiPage /> },
   { path: 'bantuan', element: <HelpPage /> },
   {
     // Demo alur 403: role dummy (OWNER) tidak termasuk → RequireRole redirect ke /akses-ditolak
