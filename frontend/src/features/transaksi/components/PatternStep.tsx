@@ -43,7 +43,7 @@ export function PatternStep(props: PatternStepProps) {
   return (
     <div className="flex flex-col gap-4">
       <GlassCard className="flex flex-col gap-4 p-5 sm:p-6">
-        <SectionHeader
+        <SectionHeader wrapSubtitle
           title="Pola struk"
           subtitle="Baris dikelompokkan menurut bentuknya. Atur peran tiap kelompok — saran otomatis sudah diisi."
         />

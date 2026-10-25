@@ -57,3 +57,11 @@ border bawah pembungkus & kartu belakang mepet tepi kanan (bug `WalletCardStack`
   `LAYER_MOBILE`/`POSE_MOBILE` + `useMediaQuery(MEDIA_QUERY.sm)`); desktop tetap.
 - Beri ruang aman di pembungkus (`pb-8 sm:py-4`) dan jangan andalkan `overflow-hidden` untuk menyembunyikan.
 - Offset satu arah membuat visual berat sebelah → geser stack berlawanan arah (`-translate-x-2 sm:translate-x-0`).
+
+## `<fieldset>` melebar karena `min-width: min-content`
+Beda dengan `div`, `<fieldset>` default `min-width: min-content`. Pola `<fieldset disabled={pending}>` yang membungkus
+kartu/grid ikut selebar teks `nowrap` terpanjang di dalamnya (mis. subjudul `SectionHeader` yang `truncate`) → meluber
+keluar layar HP. `overflow-x-clip` di `AppLayout` menyamarkannya jadi **potongan di kanan**, bukan scroll (bug langkah
+Hasil `/transaksi`, iPhone 393px: semua kartu dalam fieldset terpotong, header di luarnya normal). Aturan:
+- Selalu `min-w-0` pada fieldset pembungkus layout (`ResultStep`, `SimpleResultStep`, `LoginForm`).
+- Subjudul kalimat penjelasan panjang → `SectionHeader wrapSubtitle` (wrap), bukan ellipsis.
