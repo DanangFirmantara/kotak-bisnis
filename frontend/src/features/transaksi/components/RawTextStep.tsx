@@ -17,7 +17,7 @@ export function RawTextStep({ pages, setPageText, removeOverlap, setRemoveOverla
   return (
     <div className="flex flex-col gap-4">
       <GlassCard className="flex flex-col gap-3 p-5 sm:p-6">
-        <SectionHeader
+        <SectionHeader wrapSubtitle
           title="Periksa teks hasil baca"
           subtitle="Perbaiki baris yang salah baca (angka, huruf) sebelum lanjut — satu baris struk per baris."
         />

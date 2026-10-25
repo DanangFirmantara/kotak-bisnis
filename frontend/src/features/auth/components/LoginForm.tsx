@@ -31,7 +31,7 @@ export function LoginForm() {
   return (
     <form noValidate onSubmit={onSubmit} aria-busy={pending}>
       {/* fieldset disabled → semua input, checkbox & tombol terkunci selama submit (tanpa prop disabled satu-satu) */}
-      <fieldset disabled={pending} className="flex flex-col gap-5">
+      <fieldset disabled={pending} className="flex min-w-0 flex-col gap-5">
         <legend className="sr-only">Data masuk</legend>
 
         <TextField

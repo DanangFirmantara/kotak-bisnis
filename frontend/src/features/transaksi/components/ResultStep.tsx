@@ -70,11 +70,12 @@ export function ResultStep({ parsed, storeName, onBack }: ResultStepProps) {
 
   return (
     <form noValidate onSubmit={handleSubmit((values) => save.mutate(values))} aria-busy={pending} className="flex flex-col gap-4">
-      <fieldset disabled={pending} className="flex flex-col gap-4">
+      {/* min-w-0: fieldset default min-width = min-content → melebar ikut teks nowrap di dalamnya (bug iPhone 393px) */}
+      <fieldset disabled={pending} className="flex min-w-0 flex-col gap-4">
         <legend className="sr-only">Hasil baca struk</legend>
 
         <GlassCard className="flex flex-col gap-4 p-5 sm:p-6">
-          <SectionHeader title="Data struk" subtitle="Periksa dan koreksi sebelum disimpan." />
+          <SectionHeader wrapSubtitle title="Data struk" subtitle="Periksa dan koreksi sebelum disimpan." />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <TextField label="Nama toko" autoComplete="off" error={errors.storeName?.message} {...register('storeName')} />
             <TextField label="Metode bayar" autoComplete="off" error={errors.paymentMethod?.message} {...register('paymentMethod')} />
@@ -94,7 +95,7 @@ export function ResultStep({ parsed, storeName, onBack }: ResultStepProps) {
         </div>
 
         <GlassCard className="flex flex-col gap-3 p-5 sm:p-6">
-          <SectionHeader title="Item belanja" subtitle="Baris bertanda kuning: subtotal tidak sama dengan qty × harga − diskon." />
+          <SectionHeader wrapSubtitle title="Item belanja" subtitle="Baris bertanda kuning: subtotal tidak sama dengan qty × harga − diskon." />
           <ReceiptItemsTable form={form} rowIssues={validation.rowIssues} disabled={pending} />
           {itemsError && <p className="text-xs font-medium text-danger-deep">{itemsError}</p>}
         </GlassCard>

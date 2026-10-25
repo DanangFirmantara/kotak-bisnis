@@ -8,6 +8,8 @@ export interface SectionHeaderProps {
   titleAdornment?: ReactNode
   /** Slot kanan: filter, tombol, badge */
   action?: ReactNode
+  /** Subjudul boleh turun baris (kalimat penjelasan panjang) — default satu baris dengan ellipsis */
+  wrapSubtitle?: boolean
   /** Di atas kartu highlight → teks putih */
   onDark?: boolean
   className?: string
@@ -18,6 +20,7 @@ export function SectionHeader({
   subtitle,
   titleAdornment,
   action,
+  wrapSubtitle = false,
   onDark = false,
   className,
 }: SectionHeaderProps) {
@@ -31,7 +34,7 @@ export function SectionHeader({
           {titleAdornment}
         </div>
         {subtitle && (
-          <p className={cn('mt-0.5 truncate text-xs', onDark ? 'text-white/70' : 'text-ink-muted')}>
+          <p className={cn('mt-0.5 text-xs', !wrapSubtitle && 'truncate', onDark ? 'text-white/70' : 'text-ink-muted')}>
             {subtitle}
           </p>
         )}

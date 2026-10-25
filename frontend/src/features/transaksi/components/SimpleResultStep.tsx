@@ -73,11 +73,12 @@ export function SimpleResultStep({ simple, storeName, rawPanel, onBack, onSwitch
 
   return (
     <form noValidate onSubmit={handleSubmit((values) => save.mutate(values))} aria-busy={pending} className="flex flex-col gap-4">
-      <fieldset disabled={pending} className="flex flex-col gap-4">
+      {/* min-w-0: fieldset default min-width = min-content → melebar ikut teks nowrap di dalamnya (bug iPhone 393px) */}
+      <fieldset disabled={pending} className="flex min-w-0 flex-col gap-4">
         <legend className="sr-only">Hasil baca struk (ringkas)</legend>
 
         <GlassCard className="flex flex-col gap-4 p-5 sm:p-6">
-          <SectionHeader title="Total belanja" subtitle="Total yang dibayar dibaca dari baris TOTAL / metode bayar di struk." />
+          <SectionHeader wrapSubtitle title="Total belanja" subtitle="Total yang dibayar dibaca dari baris TOTAL / metode bayar di struk." />
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             <Controller
               control={control}
@@ -95,7 +96,7 @@ export function SimpleResultStep({ simple, storeName, rawPanel, onBack, onSwitch
         </div>
 
         <GlassCard className="flex flex-col gap-3 p-5 sm:p-6">
-          <SectionHeader title="Item belanja" subtitle="Nama produk dan harga net (sudah termasuk diskon). Koreksi seperlunya." />
+          <SectionHeader wrapSubtitle title="Item belanja" subtitle="Nama produk dan harga net (sudah termasuk diskon). Koreksi seperlunya." />
           <SimpleItemsTable form={form} disabled={pending} />
           {itemsError && <p className="text-xs font-medium text-danger-deep">{itemsError}</p>}
         </GlassCard>
